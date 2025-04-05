@@ -11,19 +11,19 @@ export class UpdateTodoDto {
   public static schema = z.object({
     id: z.number().min(1), 
     text: z.string().min(1).trim().optional(),
-    createdAt: z.string().refine(date => !isNaN(Date.parse(date))).optional(),
+    createdAt: z.string().refine( val => !val || !isNaN(new Date(val).getTime()), {
+      message: 'createdAt is not a valid Date'
+    }).transform( val => val ? new Date(val) : null).optional(),
   });
 
   public static update(props: z.infer<typeof this.schema>): [string?, UpdateTodoDto?] {
     const result = this.schema.safeParse(props);
 
     if (!result.success) {
-      return [`The property '${result.error.errors[0].path[0]}' is invalid or missing`, undefined];
+      return [`${result.error.errors[0].message}`, undefined];
     }
 
     const { id, createdAt, text } = result.data;
-    const newCompletedAt = createdAt ? new Date(createdAt) : undefined;
-
-    return [undefined, new UpdateTodoDto(id, text, newCompletedAt!)];
+    return [undefined, new UpdateTodoDto(id, text, createdAt!)];
   }
 }

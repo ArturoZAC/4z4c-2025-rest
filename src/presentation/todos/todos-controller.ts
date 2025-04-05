@@ -2,11 +2,6 @@ import { Request, Response } from "express";
 import { prisma } from "../../data/postgres";
 import { CreateTodoDto, UpdateTodoDto } from "../../domain/dtos";
 
-// const todos = [
-//   { id: 1, text: 'Buy Chocolate', completedAt: new Date()},
-//   { id: 2, text: 'Buy Watch', completedAt: new Date()}
-// ]
-
 export class TodosController {
 
   //*DI
@@ -15,7 +10,6 @@ export class TodosController {
   public getTodos = async( req: Request, res: Response) => {
 
     const todos = await prisma.todo.findMany();
-
     return res.json(todos);
   }
 

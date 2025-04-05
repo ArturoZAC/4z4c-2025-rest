@@ -7,7 +7,7 @@ export class CreateTodoDto {
   ){}
 
   public static schema = z.object({ 
-    text: z.string().min(1).trim()
+    text: z.string({message: 'The property Text is Required'}).min(1, { message: 'Text must have at least 1 letter'}).trim()
   })
 
   public static create( props: z.infer< typeof this.schema>): [string?, CreateTodoDto?] {
@@ -15,7 +15,7 @@ export class CreateTodoDto {
     const result = this.schema.safeParse(props);
 
     if (!result.success) {
-      return [`The property '${result.error.errors[0].path[0] || 'text'}' is required`, undefined];
+      return [`${result.error.errors[0].message}`, undefined];
     }
 
     return [undefined, new CreateTodoDto(result.data.text)];
