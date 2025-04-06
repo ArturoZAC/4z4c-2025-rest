@@ -18,6 +18,7 @@ export class TodosController {
 
   public getTodo = async( req: Request, res: Response) => {
     const id = +req.params.id;
+    console.log(id);
     
     try {
       const todo = await this.todoRepository.findById(id);

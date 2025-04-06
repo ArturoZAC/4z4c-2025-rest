@@ -23,16 +23,17 @@ export class AppServer {
       }
       next(err);
     });
-
+    
     this.app.use((req: Request, res: Response, next: NextFunction) => {
-      
-      if (!req.body) {
-        return res.status(400).json({
-          message: 'Invalid JSON format. Please check your request body.',
-        });
+      if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+        if (!req.body || (typeof req.body === 'object' && Object.keys(req.body).length === 0)) {
+          return res.status(400).json({
+              message: 'Invalid JSON format. Please check your request body.',
+            });
+        }
       }
       next();
-    })
+    });
 
     this.app.use( this.routes )
     this.app.listen( this.PORT, () => {

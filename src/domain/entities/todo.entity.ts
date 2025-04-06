@@ -11,9 +11,12 @@ export class TodoEntity {
   private static todoSchema = z.object({
     id: z.number().min(1, 'Id is required'),
     text: z.string().min(1, 'Text is required'), 
-    createdAt: z.string().refine(val => !val || !isNaN(new Date(val).getTime()), {
+    createdAt: z.string()
+    .refine(val => !val || !isNaN(new Date(val).getTime()), {
       message: 'createdAt is not a valid date',
-    }).optional().transform(val => val ? new Date(val) : null),
+    })
+    .optional()
+    .transform(val => val ? new Date(val) : null),
   });
 
   public isCreatedAt = () => {
