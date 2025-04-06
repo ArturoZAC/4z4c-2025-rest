@@ -7,6 +7,6 @@ export abstract class TodoDatasource {
   public abstract updateById( updateTodoDto: UpdateTodoDto ): Promise<TodoEntity>;
   public abstract getAll(): Promise<TodoEntity[]>;
   public abstract findById( id: number ): Promise<TodoEntity>;
-  public abstract deletedByUd( id: number ): Promise<TodoEntity>;
+  public abstract deletedById( id: number ): Promise<TodoEntity>;
 
 }

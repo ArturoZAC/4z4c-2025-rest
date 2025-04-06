@@ -12,8 +12,10 @@ export class AppServer {
   public async start() {
 
     this.app.use( express.json());
-    // Middleware para manejar errores de parsing de JSON
+
+
     this.app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+      
       if (err instanceof SyntaxError) {
         return res.status(400).json({
           message: 'Invalid JSON format. Please check your request body.',
@@ -22,6 +24,15 @@ export class AppServer {
       next(err);
     });
 
+    this.app.use((req: Request, res: Response, next: NextFunction) => {
+      
+      if (!req.body) {
+        return res.status(400).json({
+          message: 'Invalid JSON format. Please check your request body.',
+        });
+      }
+      next();
+    })
 
     this.app.use( this.routes )
     this.app.listen( this.PORT, () => {

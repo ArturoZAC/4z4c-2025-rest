@@ -13,7 +13,7 @@ export class TodoEntity {
     text: z.string().min(1, 'Text is required'), 
     createdAt: z.string().refine(val => !val || !isNaN(new Date(val).getTime()), {
       message: 'createdAt is not a valid date',
-    }).transform(val => val ? new Date(val) : null).optional(),
+    }).optional().transform(val => val ? new Date(val) : null),
   });
 
   public isCreatedAt = () => {
@@ -21,14 +21,16 @@ export class TodoEntity {
   }
 
   public static fromObject( object: z.infer<typeof this.todoSchema>): TodoEntity {
-    const result = TodoEntity.todoSchema.safeParse(object);
+    
+    const result = this.todoSchema.safeParse({ ...object, createdAt: object.createdAt?.toISOString() });
     
     if (!result.success) {
       throw new Error(`${result.error.errors[0].message}`);
     }
 
     const { id, text, createdAt } = result.data;
-    return new TodoEntity(id, text, createdAt);
+
+    return new TodoEntity(id, text, createdAt );
   }
 
 } 

@@ -1,41 +1,38 @@
 import { Request, Response } from "express";
 import { prisma } from "../../data/postgres";
 import { CreateTodoDto, UpdateTodoDto } from "../../domain/dtos";
+import { TodoRepository } from "../../domain";
 
 export class TodosController {
 
   //*DI
-  constructor(){}
+  constructor(
+    private readonly todoRepository: TodoRepository
+  ){}
 
   public getTodos = async( req: Request, res: Response) => {
-
-    const todos = await prisma.todo.findMany();
+    const todos = await this.todoRepository.getAll();
+    
     return res.json(todos);
   }
 
   public getTodo = async( req: Request, res: Response) => {
     const id = +req.params.id;
-    if( isNaN(id) ) return res.status(400).json({ error: 'Id argument is not a number'});
-
-    const todo = await prisma.todo.findUnique({
-      where: { id }
-    })
-
-    return todo
-      ? res.json( todo ) 
-      : res.status(404).json({ error: `Todo with id ${id} not found`})
+    
+    try {
+      const todo = await this.todoRepository.findById(id);
+      return res.json(todo);
+    } catch (error) {
+      return res.status(500).json({ error: 'Something went wrong'});
+    }
   }
 
   public createTodo = async(req: Request, res: Response) => {
-
     const [ error, createTodoDto ] = CreateTodoDto.create(req.body);
     if( error ) return res.status(400).json({ error });
-
-    const todo = await prisma.todo.create({
-      data: createTodoDto!
-    })
+    const todo = await this.todoRepository.create(createTodoDto!);
     
-    res.status(201).json( todo )
+    return res.status(201).json(todo);
   }
 
   public updatedTodo = async(req: Request, res: Response) => {
@@ -55,11 +52,6 @@ export class TodosController {
       where: { id },
       data: rest
     })
-    // todo.text = text || todo.text;
-    // ( completedAt === 'null' )
-    //   ? todo.createdAt = null!
-    //   : todo.createdAt = new Date( completedAt || todo.createdAt )
-
     return res.json(updatedTodo);
   }
 
@@ -74,7 +66,6 @@ export class TodosController {
 
     const deletedTodo = await prisma.todo.delete({
       where: { id }
-
     })
     
     return ( deletedTodo )
