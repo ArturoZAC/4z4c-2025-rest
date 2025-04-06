@@ -20,8 +20,8 @@ export class TodosController {
     try {
       const todo = await this.todoRepository.findById(id);
       return res.json(todo);
-    } catch (error) {
-      return res.status(500).json({ error: 'Something went wrong'});
+    } catch (error: any) {
+      return res.status(500).json({error: error.message});
     }
   }
 
@@ -39,13 +39,16 @@ export class TodosController {
 
     const updatedTodo = await this.todoRepository.updateById( updateTodoDto! );
 
-    return res.status(200).json(updateTodoDto);
+    return res.status(200).json(updatedTodo);
   }
 
   public deleteTodo = async(req: Request, res: Response) => {
     const id = +req.params.id;
-    const deletedTodo = await this.todoRepository.deletedById(id);
-
-    return res.status(200).json(deletedTodo)
+    try {
+      const deletedTodo = await this.todoRepository.deletedById(id);
+      return res.status(200).json(deletedTodo)
+    } catch (error: any) {
+      return res.status(500).json({error: error.message});
+    }
   }
 }
