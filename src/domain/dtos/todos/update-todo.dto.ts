@@ -11,9 +11,17 @@ export class UpdateTodoDto {
   public static schema = z.object({
     id: z.number().min(1), 
     text: z.string().min(1).trim().optional(),
-    createdAt: z.string().refine( val => !val || !isNaN(new Date(val).getTime()), {
-      message: 'createdAt is not a valid Date'
-    }).transform( val => val ? new Date(val) : null).optional(),
+    createdAt: z.string()
+    .optional()
+    .refine(val => {
+      if (!val) return true;
+      
+      const date = new Date(val);
+      return !isNaN(date.getTime()) && val === date.toISOString();
+    }, {
+      message: 'createdAt is not a valid date',
+    })
+    .transform( val => val ? new Date(val) : null)
   });
 
   public static update(props: z.infer<typeof this.schema>): [string?, UpdateTodoDto?] {
