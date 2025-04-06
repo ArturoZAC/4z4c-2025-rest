@@ -11,9 +11,8 @@ export class TodosController {
   ){}
 
   public getTodos = async( req: Request, res: Response) => {
-    // const todos = await this.todoRepository.getAll();
-    // return res.json(todos);
-
+    const todos = await this.todoRepository.getAll();
+    return res.json(todos);
   }
 
   public getTodo = async( req: Request, res: Response) => {
